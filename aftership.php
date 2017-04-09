@@ -124,6 +124,8 @@ if (is_woocommerce_active()) {
                 include_once('aftership-fields.php');
                 $this->aftership_fields = $aftership_fields;
 
+                $this->aftership_shipments = array(); // initialize as empty, load data after
+
                 include_once('class-aftership-api.php');
                 include_once('class-aftership-settings.php');
             }
@@ -175,6 +177,21 @@ if (is_woocommerce_active()) {
 
                 // just draw the layout, no data
                 global $post;
+
+                $this->aftership_shipments = get_post_meta($post->ID, '_aftership_shipments', true);
+                error_log("AAAAAAAAAAAAAAAAAAAAA");
+                error_log(print_r($this->aftership_shipments, true));
+                if ( !empty($this->aftership_shipments) ) {
+                    error_log(print_r($this->aftership_shipments, true));
+                    echo '<ul>';
+                    foreach ($this->aftership_shipments as $key => $value) {
+                        echo "<li>" . $value['aftership_tracking_provider_name'] . " #" . $value['aftership_tracking_number'] . "</li>";
+                        // echo "<li>" . var_dump($value) . "</li>";
+                        // echo '<li>' . $shipment['aftership_tracking_provider_name'] . ' #' . $shipment['aftership_tracking_number'] . '</li>';
+                    }
+                    echo '</ul>';
+                }
+                
 
                 $selected_provider = get_post_meta($post->ID, '_aftership_tracking_provider', true);
 
@@ -296,24 +313,36 @@ if (is_woocommerce_active()) {
             public function save_meta_box($post_id, $post)
             {
                 if (isset($_POST['aftership_tracking_number'])) {
+
+                    $this->aftership_shipments = get_post_meta($post_id, '_aftership_shipments', true);
+                    $new_shipment = array();
 //
-//                    // Download data
-                    $tracking_provider = woocommerce_clean($_POST['aftership_tracking_provider']);
-//                    $tracking_number = woocommerce_clean($_POST['aftership_tracking_number']);
-//                    $tracking_provider_name = woocommerce_clean($_POST['aftership_tracking_provider_name']);
-//                    $tracking_required_fields = woocommerce_clean($_POST['aftership_tracking_required_fields']);
-//                    $shipdate = woocommerce_clean(strtotime($_POST['aftership_tracking_shipdate']));
-//                    $postal = woocommerce_clean($_POST['aftership_tracking_postal']);
-//                    $account = woocommerce_clean($_POST['aftership_tracking_account']);
-//                    $tracking_key = woocommerce_clean($_POST['aftership_tracking_key']);
-//                    $tracking_destination_country = woocommerce_clean($_POST['aftership_tracking_destination_country']);
+                    // Add tracking data to post meta
+                    $new_shipment['aftership_tracking_provider'] = woocommerce_clean($_POST['aftership_tracking_provider']);
+                    $new_shipment['aftership_tracking_number'] = woocommerce_clean($_POST['aftership_tracking_number']);
+                    $new_shipment['aftership_tracking_provider_name'] = woocommerce_clean($_POST['aftership_tracking_provider_name']);
+                    // $tracking_required_fields = woocommerce_clean($_POST['aftership_tracking_required_fields']);
+                    // $shipdate = woocommerce_clean(strtotime($_POST['aftership_tracking_shipdate']));
+                    // $postal = woocommerce_clean($_POST['aftership_tracking_postal']);
+                    // $account = woocommerce_clean($_POST['aftership_tracking_account']);
+                    // $tracking_key = woocommerce_clean($_POST['aftership_tracking_key']);
+                    // $tracking_destination_country = woocommerce_clean($_POST['aftership_tracking_destination_country']);
+
+
+                    if ( !empty($this->aftership_shipments) ) {
+                        array_push($this->aftership_shipments, $new_shipment);
+                    } else {
+                        $this->aftership_shipments[] = $new_shipment;
+                    }
+
+                    update_post_meta($post_id, '_aftership_shipments', $this->aftership_shipments);
 //
-//                    // Update order data
-                    update_post_meta($post_id, '_aftership_tracking_provider', $tracking_provider);
-//                    update_post_meta($post_id, '_aftership_tracking_number', $tracking_number);
-//                    update_post_meta($post_id, '_aftership_tracking_provider_name', $tracking_provider_name);
-//                    update_post_meta($post_id, '_aftership_tracking_required_fields', $tracking_required_fields);
-//                    update_post_meta($post_id, '_aftership_tracking_shipdate', $shipdate);
+//                  // Update order data
+                    update_post_meta($post_id, '_aftership_tracking_provider', $new_shipment['aftership_tracking_provider']);
+                    update_post_meta($post_id, '_aftership_tracking_number', $new_shipment['aftership_tracking_number']);
+                    update_post_meta($post_id, '_aftership_tracking_provider_name', $new_shipment['aftership_tracking_provider_name']);
+                    // update_post_meta($post_id, '_aftership_tracking_required_fields', $tracking_required_fields);
+                   // update_post_meta($post_id, '_aftership_tracking_shipdate', $shipdate);
 //                    update_post_meta($post_id, '_aftership_tracking_postal', $postal);
 //                    update_post_meta($post_id, '_aftership_tracking_account', $account);
 //                    update_post_meta($post_id, '_aftership_tracking_key', $tracking_key);
