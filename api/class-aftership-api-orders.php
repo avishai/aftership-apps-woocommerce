@@ -265,6 +265,20 @@ class AfterShip_API_Orders extends AfterShip_API_Resource
                 'tracking_key' => get_post_meta($order->id, '_aftership_tracking_key', true),
                 'tracking_destination_country' => get_post_meta($order->id, '_aftership_tracking_destination_country', true),
 			);
+			$shipments = get_post_meta($order->id, '_aftership_shipments', true);
+			if ( !empty($shipments) ) {
+				 foreach ($shipments as $key => $value) {
+				 	$order_data['aftership']['woocommerce']['trackings'][] = array(
+						'tracking_provider' => $value['aftership_tracking_provider'],
+						'tracking_number' => $value['aftership_tracking_number'],
+						'tracking_ship_date' => $value['aftership_tracking_shipdate'],
+						'tracking_postal_code' => $value['aftership_tracking_postal'],
+						'tracking_account_number' => $value['aftership_tracking_account'],
+						'tracking_key' => $value['aftership_tracking_key'],
+						'tracking_destination_country' => $value['aftership_tracking_destination_country'],
+					);
+				 }
+			}
 		} else { //$49
 			$order_data['aftership']['woocommerce']['trackings'][] = array(
 				'tracking_number' => get_post_meta($order->id, '_tracking_number', true),
