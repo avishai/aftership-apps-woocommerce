@@ -321,6 +321,11 @@ if (is_woocommerce_active()) {
                     $new_shipment['aftership_tracking_provider'] = woocommerce_clean($_POST['aftership_tracking_provider']);
                     $new_shipment['aftership_tracking_number'] = woocommerce_clean($_POST['aftership_tracking_number']);
                     $new_shipment['aftership_tracking_provider_name'] = woocommerce_clean($_POST['aftership_tracking_provider_name']);
+                    $new_shipment['aftership_tracking_shipdate'] = null;
+                    $new_shipment['aftership_tracking_postal'] = null;
+                    $new_shipment['aftership_tracking_account'] = null;
+                    $new_shipment['aftership_tracking_key'] = null;
+                    $new_shipment['aftership_tracking_destination_country'] = null;
                     // $tracking_required_fields = woocommerce_clean($_POST['aftership_tracking_required_fields']);
                     // $shipdate = woocommerce_clean(strtotime($_POST['aftership_tracking_shipdate']));
                     // $postal = woocommerce_clean($_POST['aftership_tracking_postal']);
